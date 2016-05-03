@@ -27,7 +27,19 @@ BTSerial::BTSerial(HardwareSerial * HWS, int cmdPin, int powerPin, int statePin)
 
 
 }
-;
+
+char* BTSerial::state(){
+	return command(BT_AT_STATE, BT_AT_STATE_TIME);
+}
+
+char* BTSerial::version() {
+	return command(BT_AT_VERSION,BT_AT_VERSION_TIME);
+}
+
+int BTSerial::checkModule() {
+	command(BT_AT, BT_AT_TIME);
+	return (_buffer[0]=='O' && _buffer[1]=='K');
+}
 
 BTSerial::~BTSerial() {
 
@@ -114,7 +126,7 @@ void BTSerial::_cmd(bool cmd) {
 
 
 
-char* BTSerial::command(const char cmd[], int timeout) {
+char* BTSerial::command(const char cmd[], int timeout /*=50*/) {
 	char* result = 0;
 	_cmd(true);
 	BT_DEBUG_PRINT(">> Bluetooth sending command : ");

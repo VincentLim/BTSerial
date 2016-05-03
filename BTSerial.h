@@ -24,7 +24,7 @@
 
 #define BT_DEBUG_BEGIN(baud) BT_DEBUG_PORT.begin(baud)
 #define BT_DEBUG_WRITE(...) BT_DEBUG_PORT.write(__VA_ARGS__)
-#define BT_DEBUG_PRINT(...) BT_DEBUG_PORT.print(__VA_ARGS__)
+#define BT_DEBUG_PRINT(...) (BT_DEBUG_PORT.print(__VA_ARGS__))
 #define BT_DEBUG_PRINTLN(...) BT_DEBUG_PORT.println(__VA_ARGS__)
 
 #else
@@ -35,6 +35,13 @@
 
 #endif  // BT_DEBUG
 
+// Commands
+#define BT_AT "AT"
+#define BT_AT_TIME  50
+#define BT_AT_VERSION  "AT+VERSION?"
+#define BT_AT_VERSION_TIME  300
+#define BT_AT_STATE "AT+STATE?"
+#define BT_AT_STATE_TIME 100
 
 class BTSerial {
 public:
@@ -56,9 +63,15 @@ public:
 	size_t write(uint8_t);
 	size_t print(const char[]);
 	int readUntil(char* buffer, char term, int size_buff, int timeout);
+
 	void _cmd(bool);
 
 	char* command(const char[], int timeout = 50);
+
+	char* version();
+	int checkModule();
+	char* state();
+
 
 	virtual ~BTSerial();
 private:
