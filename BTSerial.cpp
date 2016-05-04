@@ -103,13 +103,56 @@ int BTSerial::readUntil(char* buffer, char term, int size_buff, int timeout) {
 	int cread = 0;
 	char lread = 0;
 
+	// todo : add something to detect timeouts, bufferoverflow and errors
 	while (cread < size_buff && (cread == 0 || lread != term) && millis() < end) {
-		if (available()) {
+		if (available()){
 			lread = read();
 			buffer[cread++] = lread;
 		}
 	}
 	return cread;
+
+}
+
+int BTSerial::readReturn(char* buffer, int size_buffer, int timeout){
+	// todo : detect bufferoverflow
+	int read = 0;
+	bool success=false;
+	bool failure=false;
+	unsigned long time=millis();
+	unsigned long endBefore=time+timeout;
+	char* bufPos = buffer;
+	// read lines until OK, KO or ERROR
+	while(!success && !failure && (time=millis())<endBefore){
+
+		int lineS = readUntil(bufPos,BT_NL_CHAR, size_buffer-read, timeout);
+		if(lineS >= 2 && bufPos[0]=='O' && bufPos[1]=='K'){
+			success=true;
+			_last=SUCCESS;
+		}
+		else if (lineS>=2 && bufPos[0]=='K' && bufPos[1]=='O'){
+			failure=true;
+			_last=FAILURE;
+		}
+		else if (lineS >=5 && bufPos[0]=='E' && bufPos[0]=='R' && bufPos[0]=='R' && bufPos[0]=='O' && bufPos[0]=='R'){
+			failure=true;
+			_last=FAILURE;
+		}
+		// change bufferPosition for next read
+		bufPos+=lineS;
+		read+=lineS;
+	}
+	if(time>=endBefore){
+		_last=TIMEOUT;
+	}
+	// reading over. Add termination to string and return result
+	*bufPos='\0';
+	// log
+	BT_DEBUG_PRINT("Command return : ");
+	BT_DEBUG_PRINTLN(read);
+	BT_DEBUG_PRINTLN(buffer);
+
+	return success;
 
 }
 
@@ -121,33 +164,21 @@ void BTSerial::_cmd(bool cmd) {
 		digitalWrite(_cmdPin, LOW);
 		BT_DEBUG_PRINTLN(">> Bluetooth leaving command mode.");
 	}
-	delay(200);
+
 }
 
 
 
 char* BTSerial::command(const char cmd[], int timeout /*=50*/) {
-	char* result = 0;
 	_cmd(true);
 	BT_DEBUG_PRINT(">> Bluetooth sending command : ");
 	BT_DEBUG_PRINTLN(cmd);
 	print(cmd);
 	print("\r\n");
 
+	readReturn(_buffer, BT_BUF_SIZE, timeout);
 
-
-	// read return
-	int recvd = readUntil(_buffer, '\n',BT_BUF_SIZE, timeout);
-	BT_DEBUG_PRINT("Received ");
-	BT_DEBUG_PRINTLN(recvd);
-	if (recvd > 0) {
-		_buffer[recvd]='\0';
-		BT_DEBUG_PRINTLN(_buffer);
-
-		result = _buffer;
-
-	}
 	delay(BT_READ_TO);
 	_cmd(false);
-	return result;
+	return _buffer;
 }

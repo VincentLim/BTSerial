@@ -15,6 +15,7 @@
 #define CMD_BAUDS 38400
 #define BT_BUF_SIZE 64
 #define BT_READ_TO 100
+#define BT_NL_CHAR '\n'
 
 #ifdef BT_DEBUG
 
@@ -43,6 +44,10 @@
 #define BT_AT_STATE "AT+STATE?"
 #define BT_AT_STATE_TIME 100
 
+enum BTResult{
+	SUCCESS, FAILURE, TIMEOUT, NONE
+};
+
 class BTSerial {
 public:
 	BTSerial(HardwareSerial * HWS, int cmdPin, int pwrPin, int statePin = 0 );
@@ -62,7 +67,6 @@ public:
 	int read();
 	size_t write(uint8_t);
 	size_t print(const char[]);
-	int readUntil(char* buffer, char term, int size_buff, int timeout);
 
 	void _cmd(bool);
 
@@ -81,7 +85,10 @@ private:
 	int _statePin;
 	bool _powered;
 	char _buffer[BT_BUF_SIZE];
+	BTResult _last=NONE;
 
+	int readUntil(char* buffer, char term, int size_buff, int timeout);
+	int readReturn(char* buffer, int size_buff, int timeout);
 
 };
 
