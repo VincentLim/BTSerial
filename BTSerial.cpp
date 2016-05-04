@@ -24,7 +24,7 @@ BTSerial::BTSerial(HardwareSerial * HWS, int cmdPin, int powerPin, int statePin)
 
 	_serial->setTimeout(BT_READ_TO);
 
-
+	_last=NONE;
 
 }
 
@@ -102,30 +102,49 @@ int BTSerial::readUntil(char* buffer, char term, int size_buff, int timeout) {
 	unsigned long end = millis() + timeout;
 	int cread = 0;
 	char lread = 0;
+	unsigned long lastTime;
 
-	// todo : add something to detect timeouts, bufferoverflow and errors
-	while (cread < size_buff && (cread == 0 || lread != term) && millis() < end) {
+	_serial->setTimeout(timeout);
+	// todo : add something to detect errors
+	while (cread < size_buff && (cread == 0 || lread != term) && (lastTime=millis()) < end) {
 		if (available()){
 			lread = read();
 			buffer[cread++] = lread;
 		}
+	}
+	if(cread >= size_buff){
+		_last=BUFF_OVERFLOW;
+	} else if(lastTime>=end){
+		_last=TIMEOUT;
 	}
 	return cread;
 
 }
 
 int BTSerial::readReturn(char* buffer, int size_buffer, int timeout){
-	// todo : detect bufferoverflow
+
 	int read = 0;
 	bool success=false;
 	bool failure=false;
 	unsigned long time=millis();
 	unsigned long endBefore=time+timeout;
 	char* bufPos = buffer;
+	_last=NONE;
 	// read lines until OK, KO or ERROR
 	while(!success && !failure && (time=millis())<endBefore){
 
 		int lineS = readUntil(bufPos,BT_NL_CHAR, size_buffer-read, timeout);
+		if(_last==BUFF_OVERFLOW){
+			BT_DEBUG_PRINTLN(">> Buffer Overflow.");
+			// dump remaining chars in Serial
+			dump(50);
+			return 0;
+		} else if(_last==TIMEOUT){
+			BT_DEBUG_PRINTLN(">> Read Timeout.");
+			// dump remaining chars in Serial
+			dump(1);
+			return 0;
+		}
 		if(lineS >= 2 && bufPos[0]=='O' && bufPos[1]=='K'){
 			success=true;
 			_last=SUCCESS;
@@ -134,7 +153,7 @@ int BTSerial::readReturn(char* buffer, int size_buffer, int timeout){
 			failure=true;
 			_last=FAILURE;
 		}
-		else if (lineS >=5 && bufPos[0]=='E' && bufPos[0]=='R' && bufPos[0]=='R' && bufPos[0]=='O' && bufPos[0]=='R'){
+		else if (lineS >=5 && bufPos[0]=='E' && bufPos[1]=='R' && bufPos[2]=='R' && bufPos[3]=='O' && bufPos[4]=='R'){
 			failure=true;
 			_last=FAILURE;
 		}
@@ -148,12 +167,21 @@ int BTSerial::readReturn(char* buffer, int size_buffer, int timeout){
 	// reading over. Add termination to string and return result
 	*bufPos='\0';
 	// log
-	BT_DEBUG_PRINT("Command return : ");
+	BT_DEBUG_PRINT(">> Command return : ");
 	BT_DEBUG_PRINTLN(read);
 	BT_DEBUG_PRINTLN(buffer);
 
 	return success;
 
+}
+
+void BTSerial::dump(long timeout){
+	unsigned long end = millis() + timeout;
+	while(millis()<end){
+		while(_serial->available()){
+			_serial->read();
+		}
+	}
 }
 
 void BTSerial::_cmd(bool cmd) {

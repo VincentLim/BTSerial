@@ -14,7 +14,7 @@
 
 #define CMD_BAUDS 38400
 #define BT_BUF_SIZE 64
-#define BT_READ_TO 100
+#define BT_READ_TO 50
 #define BT_NL_CHAR '\n'
 
 #ifdef BT_DEBUG
@@ -40,12 +40,12 @@
 #define BT_AT "AT"
 #define BT_AT_TIME  50
 #define BT_AT_VERSION  "AT+VERSION?"
-#define BT_AT_VERSION_TIME  300
+#define BT_AT_VERSION_TIME  100
 #define BT_AT_STATE "AT+STATE?"
 #define BT_AT_STATE_TIME 100
 
 enum BTResult{
-	SUCCESS, FAILURE, TIMEOUT, NONE
+	SUCCESS, FAILURE, TIMEOUT, BUFF_OVERFLOW, NONE
 };
 
 class BTSerial {
@@ -85,11 +85,11 @@ private:
 	int _statePin;
 	bool _powered;
 	char _buffer[BT_BUF_SIZE];
-	BTResult _last=NONE;
+	BTResult _last;
 
 	int readUntil(char* buffer, char term, int size_buff, int timeout);
 	int readReturn(char* buffer, int size_buff, int timeout);
-
+	void dump(long timeout);
 };
 
 #endif /* BTSERIAL_H_ */
