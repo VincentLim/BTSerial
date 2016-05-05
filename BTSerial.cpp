@@ -190,6 +190,7 @@ void BTSerial::_cmd(bool cmd) {
 		BT_DEBUG_PRINTLN(">> Bluetooth entering command mode.");
 	} else {
 		digitalWrite(_cmdPin, LOW);
+		_serial->setTimeout(BT_READ_TO);
 		BT_DEBUG_PRINTLN(">> Bluetooth leaving command mode.");
 	}
 
