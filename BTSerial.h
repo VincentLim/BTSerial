@@ -40,9 +40,14 @@
 #define BT_AT "AT"
 #define BT_AT_TIME  50
 #define BT_AT_VERSION  "AT+VERSION?"
-#define BT_AT_VERSION_TIME  100
+#define BT_AT_VERSION_TIME  150
 #define BT_AT_STATE "AT+STATE?"
-#define BT_AT_STATE_TIME 100
+#define BT_AT_STATE_TIME 150
+#define BT_AT_ADDR "AT+ADDR?"
+#define BT_AT_ADDR_TIME 150
+#define BT_AT_NAME "AT+NAME?"
+#define BT_AT_NAME_TIME 150
+
 
 enum BTResult{
 	SUCCESS, FAILURE, TIMEOUT, BUFF_OVERFLOW, NONE
@@ -70,13 +75,16 @@ public:
 
 	void _cmd(bool);
 
-	char* command(const char[], int timeout = 50);
+	char* command(const char[], int timeout = BT_READ_TO);
 
+	// AT commands
 	char* version();
 	int checkModule();
 	char* state();
+	char* address();
+	char* name();
 
-	BTResult getLastResult(char* result, int size, int* resultSize);
+	BTResult getLastResult(char* result, int size);
 
 
 	virtual ~BTSerial();

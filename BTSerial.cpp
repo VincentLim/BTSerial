@@ -36,10 +36,14 @@ char* BTSerial::version() {
 	return command(BT_AT_VERSION,BT_AT_VERSION_TIME);
 }
 
+
+char* BTSerial::address() {
+	return command(BT_AT_ADDR, BT_AT_ADDR_TIME);
+}
+
 int BTSerial::checkModule() {
-	//todo use return from command() call;
 	command(BT_AT, BT_AT_TIME);
-	return (_buffer[0]=='O' && _buffer[1]=='K');
+	return (_last==SUCCESS);
 }
 
 BTSerial::~BTSerial() {
@@ -131,7 +135,7 @@ int BTSerial::readReturn(char* buffer, int size_buffer, int timeout){
 	unsigned long endBefore=time+timeout;
 	char* bufPos = buffer;
 	_last=NONE;
-	// read lines until OK, KO or ERROR
+	// read lines until OK, FAIL or ERROR
 	while(!success && !failure && (time=millis())<endBefore){
 
 		int lineS = readUntil(bufPos,BT_NL_CHAR, size_buffer-read, timeout);
@@ -146,11 +150,11 @@ int BTSerial::readReturn(char* buffer, int size_buffer, int timeout){
 			dump(1);
 			return 0;
 		}
-		if(lineS >= 2 && bufPos[0]=='O' && bufPos[1]=='K'){
+		if(lineS >= 2 && bufPos[0]=='O' && bufPos[1]=='K'){ // TODO change this awful comparison
 			success=true;
 			_last=SUCCESS;
 		}
-		else if (lineS>=2 && bufPos[0]=='K' && bufPos[1]=='O'){
+		else if (lineS>=2 && bufPos[0]=='F' && bufPos[1]=='A' && bufPos[2]=='I' && bufPos[3]=='L'){
 			failure=true;
 			_last=FAILURE;
 		}
@@ -176,9 +180,14 @@ int BTSerial::readReturn(char* buffer, int size_buffer, int timeout){
 
 }
 
-BTResult BTSerial::getLastResult(char* result, int size, int* resultSize) {
+BTResult BTSerial::getLastResult(char* result, int size) {
+	// I don't really know which strncpy I'm using..
 	strncpy(result, _buffer, size);
 	return _last;
+}
+
+char* BTSerial::name() {
+	return command(BT_AT_NAME, BT_AT_NAME_TIME);
 }
 
 void BTSerial::dump(long timeout){
