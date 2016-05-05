@@ -6,7 +6,7 @@
  *   Software under license GPLv3 : http://www.gnu.org/licenses/gpl-3.0.fr.html
  */
 #include <Arduino.h>
-
+#include <string.h>
 #define BT_DEBUG
 
 #include "BTSerial.h"
@@ -37,6 +37,7 @@ char* BTSerial::version() {
 }
 
 int BTSerial::checkModule() {
+	//todo use return from command() call;
 	command(BT_AT, BT_AT_TIME);
 	return (_buffer[0]=='O' && _buffer[1]=='K');
 }
@@ -173,6 +174,11 @@ int BTSerial::readReturn(char* buffer, int size_buffer, int timeout){
 
 	return success;
 
+}
+
+BTResult BTSerial::getLastResult(char* result, int size, int* resultSize) {
+	strncpy(result, _buffer, size);
+	return _last;
 }
 
 void BTSerial::dump(long timeout){

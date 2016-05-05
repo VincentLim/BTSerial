@@ -76,6 +76,8 @@ public:
 	int checkModule();
 	char* state();
 
+	BTResult getLastResult(char* result, int size, int* resultSize);
+
 
 	virtual ~BTSerial();
 private:
