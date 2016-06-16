@@ -12,9 +12,11 @@
 #include "BTSerial.h"
 
 
-BTSerial::BTSerial(HardwareSerial * HWS, int cmdPin, int powerPin, int statePin) :
+BTSerial::BTSerial(SERIAL * HWS, int cmdPin, int powerPin, int statePin) :
 		_serial(HWS), _cmdPin(cmdPin), _pwrPin(powerPin), _statePin(statePin), _powered(
-		false) {
+		false)
+
+{
 
 	pinMode(_cmdPin, OUTPUT);
 	pinMode(_pwrPin, OUTPUT);
@@ -105,24 +107,24 @@ size_t BTSerial::print(const char charArray[]) {
 
 int BTSerial::readUntil(char* buffer, char term, int size_buff, int timeout) {
 	unsigned long end = millis() + timeout;
-	int cread = 0;
-	char lread = 0;
+	int readCount = 0;
+	char lastRead = 0;
 	unsigned long lastTime;
 
 	_serial->setTimeout(timeout);
 	// todo : add something to detect errors
-	while (cread < size_buff && (cread == 0 || lread != term) && (lastTime=millis()) < end) {
+	while (readCount < size_buff && (readCount == 0 || lastRead != term) && (lastTime=millis()) < end) {
 		if (available()){
-			lread = read();
-			buffer[cread++] = lread;
+			lastRead = read();
+			buffer[readCount++] = lastRead;
 		}
 	}
-	if(cread >= size_buff){
+	if(readCount >= size_buff){
 		_last=BUFF_OVERFLOW;
 	} else if(lastTime>=end){
 		_last=TIMEOUT;
 	}
-	return cread;
+	return readCount;
 
 }
 
@@ -142,12 +144,12 @@ int BTSerial::readReturn(char* buffer, int size_buffer, int timeout){
 		if(_last==BUFF_OVERFLOW){
 			BT_DEBUG_PRINTLN(">> Buffer Overflow.");
 			// dump remaining chars in Serial
-			dump(50);
+			dump(BT_READ_TO);
 			return 0;
 		} else if(_last==TIMEOUT){
 			BT_DEBUG_PRINTLN(">> Read Timeout.");
 			// dump remaining chars in Serial
-			dump(1);
+			dump(BT_READ_TO);
 			return 0;
 		}
 		if(lineS >= 2 && bufPos[0]=='O' && bufPos[1]=='K'){ // TODO change this awful comparison

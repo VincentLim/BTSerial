@@ -5,12 +5,20 @@
  *      Author: Vincent Limorté
  *
  *  Software under license GPLv3 : http://www.gnu.org/licenses/gpl-3.0.fr.html
+ *
+ *
  */
-
-#include <HardwareSerial.h>
 
 #ifndef BTSERIAL_H_
 #define BTSERIAL_H_
+
+#ifdef BT_USE_SOFTWARE_SERIAL
+#include <SoftwareSerial.h>
+#define SERIAL SoftwareSerial
+#else
+#include <HardwareSerial.h>
+#define SERIAL HardwareSerial
+#endif
 
 #define CMD_BAUDS 38400
 #define BT_BUF_SIZE 64
@@ -29,40 +37,45 @@
 #define BT_DEBUG_PRINTLN(...) BT_DEBUG_PORT.println(__VA_ARGS__)
 
 #else
-#define DEBUG_BEGIN(baud)
-#define DEBUG_WRITE(...)
-#define DEBUG_PRINT(...)
-#define DEBUG_PRINTLN(...)
+#define BT_DEBUG_BEGIN(baud)
+#define BT_DEBUG_WRITE(...)
+#define BT_DEBUG_PRINT(...)
+#define BT_DEBUG_PRINTLN(...)
 
 #endif  // BT_DEBUG
 
 // Commands
 #define BT_AT "AT"
 #define BT_AT_TIME  50
+
 #define BT_AT_VERSION  "AT+VERSION?"
 #define BT_AT_VERSION_TIME  150
+
 #define BT_AT_STATE "AT+STATE?"
 #define BT_AT_STATE_TIME 150
+
 #define BT_AT_ADDR "AT+ADDR?"
 #define BT_AT_ADDR_TIME 150
+
 #define BT_AT_NAME "AT+NAME?"
 #define BT_AT_NAME_TIME 150
 
-
-enum BTResult{
+enum BTResult {
 	SUCCESS, FAILURE, TIMEOUT, BUFF_OVERFLOW, NONE
 };
 
 class BTSerial {
 public:
-	BTSerial(HardwareSerial * HWS, int cmdPin, int pwrPin, int statePin = 0 );
+
+
+	BTSerial(SERIAL * SWS, int cmdPin, int pwrPin, int statePin = 0 );
 
 	/**
 	 * Power on + init serial transmission.
 	 * cmd : true : start on command mode at 38400 bauds
 	 * false start on communication mode at 'baud' bauds
 	 */
-	void powerOn(bool cmd, int baud=9600);
+	void powerOn(bool cmd, int baud = 9600);
 	void powerOff();
 
 	void begin(int baud);
@@ -86,10 +99,10 @@ public:
 
 	BTResult getLastResult(char* result, int size);
 
-
 	virtual ~BTSerial();
 private:
-	HardwareSerial* _serial;
+
+	SERIAL* _serial;
 	int _cmdPin;
 	int _pwrPin;
 	int _statePin;
