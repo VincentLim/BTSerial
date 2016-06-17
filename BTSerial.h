@@ -60,8 +60,30 @@
 #define BT_AT_NAME "AT+NAME?"
 #define BT_AT_NAME_TIME 150
 
+#define BT_AT_ROLE_GET "AT+ROLE?"
+#define BT_AT_ROLE_GET_TIME 150
+
+#define BT_AT_ROLE_SET "AT+ROLE="
+#define BT_AT_ROLE_SET_TIME 150
+
+enum BTRole{
+	SLAVE=0,
+	MASTER=1,
+	SLAVE_LOOP=2,
+	ROLE_ERROR=-1
+};
+
 enum BTResult {
-	SUCCESS, FAILURE, TIMEOUT, BUFF_OVERFLOW, NONE
+	SUCCESS,
+	FAILURE,
+	TIMEOUT,
+	BUFF_OVERFLOW,
+	NONE
+};
+
+struct Device {
+	char address[14];
+	char name[64];
 };
 
 class BTSerial {
@@ -96,6 +118,8 @@ public:
 	char* state();
 	char* address();
 	char* name();
+	BTRole getRole();
+	BTResult setRole(BTRole role);
 
 	BTResult getLastResult(char* result, int size);
 
@@ -113,6 +137,7 @@ private:
 	int readUntil(char* buffer, char term, int size_buff, int timeout);
 	int readReturn(char* buffer, int size_buff, int timeout);
 	void dump(long timeout);
+	BTRole _parseRole(char* cmdResult);
 };
 
 #endif /* BTSERIAL_H_ */

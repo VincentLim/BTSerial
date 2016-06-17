@@ -183,13 +183,44 @@ int BTSerial::readReturn(char* buffer, int size_buffer, int timeout){
 }
 
 BTResult BTSerial::getLastResult(char* result, int size) {
-	// I don't really know which strncpy I'm using..
+	// TODO I don't really know which strncpy I'm using..
 	strncpy(result, _buffer, size);
 	return _last;
 }
 
 char* BTSerial::name() {
 	return command(BT_AT_NAME, BT_AT_NAME_TIME);
+}
+
+BTRole BTSerial::getRole() {
+	command(BT_AT_ROLE_GET, BT_AT_ROLE_GET_TIME);
+	if(_last==SUCCESS){
+		return _parseRole(_buffer);
+	}
+	return ROLE_ERROR;
+}
+
+
+
+BTResult BTSerial::setRole(BTRole role) {
+	char cmd[16]=BT_AT_ROLE_SET;
+	cmd[8]=role;
+	cmd[9]='\0'; // TODO ??
+
+	return command(cmd, BT_AT_ROLE_SET_TIME);
+}
+
+BTRole BTSerial::_parseRole(char* cmdResult){
+	char* idx=strstr(cmdResult, "ROLE:");
+	if(idx != NULL){
+		idx+=5;
+		switch(*idx){
+			case 0: return SLAVE;
+			case 1: return MASTER;
+			case 2: return SLAVE_LOOP;
+		}
+	}
+	return ROLE_ERROR;
 }
 
 void BTSerial::dump(long timeout){
@@ -228,3 +259,5 @@ char* BTSerial::command(const char cmd[], int timeout /*=50*/) {
 	_cmd(false);
 	return _buffer;
 }
+
+
