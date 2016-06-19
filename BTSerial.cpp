@@ -11,12 +11,10 @@
 #include "BTSerial.h"
 
 
-BTSerial::BTSerial(SERIAL * HWS, int cmdPin, int powerPin, int statePin) :
+BTSerial::BTSerial(BTSERIAL * HWS, int cmdPin, int powerPin, int statePin) :
 		_serial(HWS), _cmdPin(cmdPin), _pwrPin(powerPin), _statePin(statePin), _powered(
 		false)
-
 {
-
 	pinMode(_cmdPin, OUTPUT);
 	pinMode(_pwrPin, OUTPUT);
 	if (_statePin) {
@@ -26,7 +24,6 @@ BTSerial::BTSerial(SERIAL * HWS, int cmdPin, int powerPin, int statePin) :
 	_serial->setTimeout(BT_READ_TO);
 
 	_last=NONE;
-
 }
 
 char* BTSerial::state(){
@@ -192,6 +189,8 @@ char* BTSerial::name() {
 }
 
 BTRole BTSerial::getRole() {
+	BT_DEBUG_PRINT(">> Asking Role : ");
+
 	command(BT_AT_ROLE_GET, BT_AT_ROLE_GET_TIME);
 	if(_last==SUCCESS){
 		return _parseRole(_buffer);
@@ -216,11 +215,15 @@ BTRole BTSerial::_parseRole(char* cmdResult){
 	if(idx != NULL){
 		idx+=5; // TODO no magic number
 		switch(*idx){
-			case 0: return SLAVE;
-			case 1: return MASTER;
-			case 2: return SLAVE_LOOP;
+			case '0':
+				return SLAVE;
+			case '1':
+				return MASTER;
+			case '2':
+				return SLAVE_LOOP;
 		}
 	}
+	BT_DEBUG_PRINTLN("ERROR");
 	return ROLE_ERROR;
 }
 

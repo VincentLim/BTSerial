@@ -14,10 +14,10 @@
 
 #ifdef BT_USE_SOFTWARE_SERIAL
 #include <SoftwareSerial.h>
-#define SERIAL SoftwareSerial
+#define BTSERIAL SoftwareSerial
 #else
 #include <HardwareSerial.h>
-#define SERIAL HardwareSerial
+#define BTSERIAL HardwareSerial
 #endif
 
 #define CMD_BAUDS 38400
@@ -90,7 +90,7 @@ class BTSerial {
 public:
 
 
-	BTSerial(SERIAL * SWS, int cmdPin, int pwrPin, int statePin = 0 );
+	BTSerial(BTSERIAL * SWS, int cmdPin, int pwrPin, int statePin = 0 );
 
 	/**
 	 * Power on + init serial transmission.
@@ -126,7 +126,7 @@ public:
 	virtual ~BTSerial();
 private:
 
-	SERIAL* _serial;
+	BTSERIAL* _serial;
 	int _cmdPin;
 	int _pwrPin;
 	int _statePin;
