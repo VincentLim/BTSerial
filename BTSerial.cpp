@@ -6,7 +6,6 @@
  *   Software under license GPLv3 : http://www.gnu.org/licenses/gpl-3.0.fr.html
  */
 #include <Arduino.h>
-#include <string.h>
 #define BT_DEBUG
 
 #include "BTSerial.h"
@@ -49,7 +48,7 @@ int BTSerial::checkModule() {
 }
 
 BTSerial::~BTSerial() {
-
+ _serial->end();
 }
 
 void BTSerial::powerOn(bool cmd, int baud) {
@@ -205,15 +204,17 @@ BTRole BTSerial::getRole() {
 BTResult BTSerial::setRole(BTRole role) {
 	char cmd[16]=BT_AT_ROLE_SET;
 	cmd[8]=role;
-	cmd[9]='\0'; // TODO ??
+	cmd[9]='\0'; // TODO Est-ce vraiment nécessaire ?
 
-	return command(cmd, BT_AT_ROLE_SET_TIME);
+	command(cmd, BT_AT_ROLE_SET_TIME);
+
+	return _last;
 }
 
 BTRole BTSerial::_parseRole(char* cmdResult){
-	char* idx=strstr(cmdResult, "ROLE:");
+	char* idx=strstr(cmdResult, "ROLE:"); // TODO : #define this
 	if(idx != NULL){
-		idx+=5;
+		idx+=5; // TODO no magic number
 		switch(*idx){
 			case 0: return SLAVE;
 			case 1: return MASTER;
