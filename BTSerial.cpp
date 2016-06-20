@@ -202,7 +202,7 @@ BTRole BTSerial::getRole() {
 
 BTResult BTSerial::setRole(BTRole role) {
 	char cmd[16]=BT_AT_ROLE_SET;
-	cmd[8]=role;
+	cmd[8]=role+'0';
 	cmd[9]='\0'; // TODO Est-ce vraiment nécessaire ?
 
 	command(cmd, BT_AT_ROLE_SET_TIME);
