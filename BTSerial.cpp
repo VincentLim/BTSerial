@@ -121,6 +121,16 @@ char* BTSerial::name() {
 	return command(BT_AT_NAME, BT_AT_NAME_TIME);
 }
 
+BTResult BTSerial::setName(const char* name){
+	char buff[64];
+	size_t len_cmd=strlen(BT_AT_SET_NAME);
+	size_t len_name=strlen(name);
+	strncpy(buff,BT_AT_SET_NAME,len_cmd);
+	strncpy(buff+len_cmd, name, min(64-len_cmd, len_name));
+	command(buff, BT_AT_SET_NAME_TIME);
+	return _last;
+}
+
 BTRole BTSerial::getRole() {
 	command(BT_AT_ROLE_GET, BT_AT_ROLE_GET_TIME);
 	if(_last==SUCCESS){
