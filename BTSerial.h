@@ -44,27 +44,6 @@
 
 #endif  // BT_DEBUG
 
-// Commands
-#define BT_AT "AT"
-#define BT_AT_TIME  50
-
-#define BT_AT_VERSION  "AT+VERSION?"
-#define BT_AT_VERSION_TIME  150
-
-#define BT_AT_STATE "AT+STATE?"
-#define BT_AT_STATE_TIME 150
-
-#define BT_AT_ADDR "AT+ADDR?"
-#define BT_AT_ADDR_TIME 150
-
-#define BT_AT_NAME "AT+NAME?"
-#define BT_AT_NAME_TIME 150
-
-#define BT_AT_ROLE_GET "AT+ROLE?"
-#define BT_AT_ROLE_GET_TIME 150
-
-#define BT_AT_ROLE_SET "AT+ROLE="
-#define BT_AT_ROLE_SET_TIME 150
 
 enum BTRole{
 	SLAVE=0,
