@@ -97,7 +97,7 @@ public:
 	char* state();
 	char* address();
 	char* name();
-	BTResult setName(const char* name)
+	BTResult setName(const char* name);
 	BTRole getRole();
 	BTResult setRole(BTRole role);
 
