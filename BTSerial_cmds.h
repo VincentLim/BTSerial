@@ -37,7 +37,7 @@
 #define BT_AT_ROLE_SET_TIME 150
 #define BT_SET_ROLE_WAIT 500
 
-
-
+#define BT_AT_INIT "AT+INIT"
+#define BT_AT_INIT_TIME 150
 
 #endif /* BTSERIAL_CMDS_H_ */

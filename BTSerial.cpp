@@ -122,11 +122,14 @@ char* BTSerial::name() {
 }
 
 BTResult BTSerial::setName(const char* name){
+
 	char buff[41]; // Name limited to 32 bytes
+
 	size_t len_cmd=strlen(BT_AT_SET_NAME);
 	size_t len_name=strlen(name);
 	size_t buf_end=min(40, len_name+len_cmd);
 	strncpy(buff,BT_AT_SET_NAME,len_cmd);
+
 	strncpy(buff+len_cmd, name, buf_end-len_cmd);
 	buff[buf_end]=0;
 
@@ -136,6 +139,7 @@ BTResult BTSerial::setName(const char* name){
 	}
 
 	command(buff, timeout);
+
 	return _last;
 }
 
@@ -155,6 +159,11 @@ BTResult BTSerial::setRole(BTRole role) {
 	command(cmd, BT_AT_ROLE_SET_TIME);
 	// wait a little for module to operate
 	delay(BT_SET_ROLE_WAIT);
+	return _last;
+}
+
+BTResult BTSerial::init(){
+	command(BT_AT_INIT, BT_AT_INIT_TIME);
 	return _last;
 }
 
@@ -267,7 +276,7 @@ void BTSerial::dump(long timeout){
 	}
 }
 
-char* BTSerial::command(const char cmd[], int timeout /*=50*/) {
+char* BTSerial::command(const char cmd[], int timeout /*default=BT_READ_TO*/) {
 	_cmd(true);
 	BT_DEBUG_PRINT(">> Bluetooth sending command : ");
 	BT_DEBUG_PRINTLN(cmd);
@@ -277,6 +286,7 @@ char* BTSerial::command(const char cmd[], int timeout /*=50*/) {
 	readReturn(_buffer, BT_BUF_SIZE, timeout);
 
 	delay(BT_READ_TO);
+	dump(BT_READ_TO);
 	_cmd(false);
 	return _buffer;
 }
