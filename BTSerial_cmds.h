@@ -40,4 +40,10 @@
 #define BT_AT_INIT "AT+INIT"
 #define BT_AT_INIT_TIME 150
 
+#define BT_AT_SET_PSWD "AT+PSWD="
+#define BT_AT_SET_PSWD_TIME 150
+
+#define BT_AT_GET_PSWD "AT+PSWD?"
+#define BT_AT_GET_PSWD_TIME 150
+
 #endif /* BTSERIAL_CMDS_H_ */
