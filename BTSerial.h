@@ -100,6 +100,8 @@ public:
 	BTResult setName(const char* name);
 	BTRole getRole();
 	BTResult setRole(BTRole role);
+	BTResult init();
+
 
 	BTResult getLastResult(char* result, int size);
 
