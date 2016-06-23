@@ -122,12 +122,20 @@ char* BTSerial::name() {
 }
 
 BTResult BTSerial::setName(const char* name){
-	char buff[64];
+	char buff[41]; // Name limited to 32 bytes
 	size_t len_cmd=strlen(BT_AT_SET_NAME);
 	size_t len_name=strlen(name);
+	size_t buf_end=min(40, len_name+len_cmd);
 	strncpy(buff,BT_AT_SET_NAME,len_cmd);
-	strncpy(buff+len_cmd, name, min(64-len_cmd, len_name));
-	command(buff, BT_AT_SET_NAME_TIME);
+	strncpy(buff+len_cmd, name, buf_end-len_cmd);
+	buff[buf_end]=0;
+
+	int timeout = BT_AT_SET_NAME_TIME;
+	if(len_name>20){
+		timeout*=2;
+	}
+
+	command(buff, timeout);
 	return _last;
 }
 
