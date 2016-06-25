@@ -24,6 +24,8 @@
 #define BT_BUF_SIZE 64
 #define BT_READ_TO 50
 #define BT_NL_CHAR '\n'
+#define BT_PSWD_LEN 4
+
 
 #ifdef BT_DEBUG
 
@@ -101,6 +103,8 @@ public:
 	BTRole getRole();
 	BTResult setRole(BTRole role);
 	BTResult init();
+	BTResult setPasswd(const char* passwd);
+	char* getPasswd();
 
 
 	BTResult getLastResult(char* result, int size);
@@ -114,12 +118,14 @@ private:
 	int _statePin;
 	bool _powered;
 	char _buffer[BT_BUF_SIZE];
+	char _pswd[BT_PSWD_LEN];
 	BTResult _last;
 
 	int readUntil(char* buffer, char term, int size_buff, int timeout);
 	int readReturn(char* buffer, int size_buff, int timeout);
 	void dump(long timeout);
 	BTRole _parseRole(char* cmdResult);
+	void _parsePswd(const char* cmdResult);
 };
 
 #endif /* BTSERIAL_H_ */

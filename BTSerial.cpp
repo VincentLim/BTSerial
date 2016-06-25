@@ -167,6 +167,21 @@ BTResult BTSerial::init(){
 	return _last;
 }
 
+BTResult BTSerial::setPasswd(const char* passwd) {
+	char cmd[16]=BT_AT_SET_PSWD;
+	size_t cmd_len = strlen(BT_AT_SET_PSWD);
+	strncat(cmd, passwd, BT_PSWD_LEN);
+
+	command(cmd, BT_AT_SET_PSWD_TIME);
+	return _last;
+}
+
+char* BTSerial::getPasswd() {
+	command(BT_AT_GET_PSWD, BT_AT_GET_PSWD_TIME);
+	_parsePswd(_buffer);
+	return _pswd;
+}
+
 // Utilities
 
 int BTSerial::readUntil(char* buffer, char term, int size_buff, int timeout) {
@@ -267,6 +282,15 @@ BTRole BTSerial::_parseRole(char* cmdResult){
 	return ROLE_ERROR;
 }
 
+void BTSerial::_parsePswd(const char* cmdResult){
+	char* idx=strstr(cmdResult, "PSWD:"); // TODO : #define this
+		if(idx != NULL){
+			idx+=5; // TODO no magic number
+			strncpy(_pswd, idx, BT_PSWD_LEN);
+			_pswd[4]='\0';
+		}
+}
+
 void BTSerial::dump(long timeout){
 	unsigned long end = millis() + timeout;
 	while(millis()<end){
@@ -290,3 +314,5 @@ char* BTSerial::command(const char cmd[], int timeout /*default=BT_READ_TO*/) {
 	_cmd(false);
 	return _buffer;
 }
+
+
