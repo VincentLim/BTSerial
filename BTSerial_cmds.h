@@ -46,4 +46,10 @@
 #define BT_AT_GET_PSWD "AT+PSWD?"
 #define BT_AT_GET_PSWD_TIME 150
 
+#define BT_AT_RMAAD "AT+RMAAD"
+#define BT_AT_RMAAD_TIME 200
+
+#define BT_AT_ADCN "AT+ADCN?"
+#define BT_AT_ACDN_TIME 150
+
 #endif /* BTSERIAL_CMDS_H_ */

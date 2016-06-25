@@ -105,7 +105,8 @@ public:
 	BTResult init();
 	BTResult setPasswd(const char* passwd);
 	char* getPasswd();
-
+	BTResult deletePairList();
+	int countPairList();
 
 	BTResult getLastResult(char* result, int size);
 
@@ -120,12 +121,16 @@ private:
 	char _buffer[BT_BUF_SIZE];
 	char _pswd[BT_PSWD_LEN];
 	BTResult _last;
+	char _address[16];
+
 
 	int readUntil(char* buffer, char term, int size_buff, int timeout);
 	int readReturn(char* buffer, int size_buff, int timeout);
 	void dump(long timeout);
+	char* strnxt(const char* str, const char* token);
 	BTRole _parseRole(char* cmdResult);
 	void _parsePswd(const char* cmdResult);
+	int _parseInt(const char* cmdResult, const char* token);
 };
 
 #endif /* BTSERIAL_H_ */
