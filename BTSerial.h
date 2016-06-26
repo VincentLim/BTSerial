@@ -54,6 +54,13 @@ enum BTRole{
 	ROLE_ERROR=-1
 };
 
+enum BTCMode{
+	FIXED='0',
+	ANY='1',
+	CMODE_SLAVE_LOOP='2',
+	CMODE_ERROR=0
+};
+
 enum BTResult {
 	SUCCESS,
 	FAILURE,
@@ -107,6 +114,8 @@ public:
 	char* getPasswd();
 	BTResult deletePairList();
 	int countPairList();
+	BTResult setCMode(BTCMode cMode);
+	BTCMode getCMode();
 
 	BTResult getLastResult(char* result, int size);
 
