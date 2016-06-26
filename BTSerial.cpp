@@ -243,7 +243,17 @@ int BTSerial::link(char* addr) {
 	command(cmd, BT_AT_LINK_TIME);
 
 	return _last==SUCCESS;
+}
 
+
+int BTSerial::seekDevice(char* addr) {
+	strreplace(addr, ':', ',');
+	char cmd[32]=BT_AT_FSAD;
+	size_t len=strlen(BT_AT_FSAD);
+	strncpy(cmd+len, addr, 14);
+	command(cmd, BT_AT_FSAD_TIME);
+
+	return _last==SUCCESS;
 }
 
 // Utilities

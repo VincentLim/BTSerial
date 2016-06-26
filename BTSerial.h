@@ -119,6 +119,7 @@ public:
 	BTResult setCMode(BTCMode cMode);
 	BTCMode getCMode();
 	int link(char* addr);
+	int seekDevice(char* addr);
 
 	// Utils
 	BTResult getLastResult(char* result, int size);

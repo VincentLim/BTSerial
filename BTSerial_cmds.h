@@ -61,7 +61,7 @@
 #define BT_AT_LINK "AT+LINK="
 #define BT_AT_LINK_TIME 2000
 
-#define BT_AT_FSAD "AT+FSAD"
+#define BT_AT_FSAD "AT+FSAD="
 #define BT_AT_FSAD_TIME 250
 
 
