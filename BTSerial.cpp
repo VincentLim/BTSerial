@@ -13,6 +13,17 @@
 #include "BTSerial.h"
 #include "BTSerial_cmds.h"
 
+char* strreplace(char* str, char pattern, char replace){
+	char* pos=str;
+	while(*pos){
+		if(*pos==pattern){
+			*pos=replace;
+		}
+		++pos;
+	}
+	return str;
+}
+
 // Constructor
 BTSerial::BTSerial(BTSERIAL * HWS, int cmdPin, int powerPin, int statePin) :
 		_serial(HWS), _cmdPin(cmdPin), _pwrPin(powerPin), _statePin(statePin), _powered(
@@ -106,7 +117,10 @@ char* BTSerial::version() {
 
 char* BTSerial::address() {
 	command(BT_AT_ADDR, BT_AT_ADDR_TIME);
-	return _storeAddress(_buffer);
+	if(_last==SUCCESS){
+		return _storeAddress(_buffer);
+	}
+	return NULL;
 
 }
 
@@ -219,6 +233,17 @@ BTCMode BTSerial::getCMode() {
 		}
 	}
 	return CMODE_ERROR;
+}
+
+int BTSerial::link(char* addr) {
+	strreplace(addr, ':', ',');
+	char cmd[32]=BT_AT_LINK;
+	size_t len=strlen(BT_AT_LINK);
+	strncpy(cmd+len, addr, 14);
+	command(cmd, BT_AT_LINK_TIME);
+
+	return _last==SUCCESS;
+
 }
 
 // Utilities
@@ -357,11 +382,17 @@ void BTSerial::_parsePswd(const char* cmdResult) {
 
 void BTSerial::dump(long timeout) {
 	unsigned long end = millis() + timeout;
+	int read=0;
+	BT_DEBUG_PRINT("<< DUMP ");
 	while (millis() < end) {
-		while (_serial->available()) {
-			_serial->read();
+		if (_serial->available()) {
+			BT_DEBUG_PRINT((char)_serial->read());
+			read++;
 		}
 	}
+	BT_DEBUG_PRINT(" ## ");
+	BT_DEBUG_PRINT(read);
+	BT_DEBUG_PRINTLN(" chars dumped.");
 }
 
 char* BTSerial::command(const char cmd[], int timeout /*default=BT_READ_TO*/) {
@@ -372,9 +403,10 @@ char* BTSerial::command(const char cmd[], int timeout /*default=BT_READ_TO*/) {
 
 	readReturn(_buffer, BT_BUF_SIZE, timeout);
 
-	delay(BT_READ_TO);
-	dump(BT_READ_TO);
+//	delay(BT_READ_TO);
+//	dump(BT_READ_TO);
 	_cmd(false);
 	return _buffer;
 }
+
 

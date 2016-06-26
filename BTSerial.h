@@ -74,6 +74,8 @@ struct Device {
 	char name[64];
 };
 
+char* strreplace(char* str, char pattern, char replace);
+
 class BTSerial {
 public:
 
@@ -116,7 +118,9 @@ public:
 	int countPairList();
 	BTResult setCMode(BTCMode cMode);
 	BTCMode getCMode();
+	int link(char* addr);
 
+	// Utils
 	BTResult getLastResult(char* result, int size);
 
 	virtual ~BTSerial();
