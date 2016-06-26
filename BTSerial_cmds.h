@@ -22,7 +22,7 @@
 #define BT_AT_STATE_TIME 150
 
 #define BT_AT_ADDR "AT+ADDR?"
-#define BT_AT_ADDR_TIME 150
+#define BT_AT_ADDR_TIME 200
 
 #define BT_AT_NAME "AT+NAME?"
 #define BT_AT_NAME_TIME 150
@@ -50,12 +50,19 @@
 #define BT_AT_RMAAD_TIME 200
 
 #define BT_AT_ADCN "AT+ADCN?"
-#define BT_AT_ACDN_TIME 150
+#define BT_AT_ACDN_TIME 500
 
 #define BT_AT_SET_CMODE "AT+CMODE="
 #define BT_AT_SET_CMODE_TIME 150
 
 #define BT_AT_GET_CMODE "AT+CMODE?"
 #define BT_AT_GET_CMODE_TIME 150
+
+#define BT_AT_LINK "AT+LINK="
+#define BT_AT_LINK_TIME 2000
+
+#define BT_AT_FSAD "AT+FSAD="
+#define BT_AT_FSAD_TIME 250
+
 
 #endif /* BTSERIAL_CMDS_H_ */
