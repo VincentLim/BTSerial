@@ -24,7 +24,7 @@
 #define BT_BUF_SIZE 64
 #define BT_READ_TO 50
 #define BT_NL_CHAR '\n'
-#define BT_PSWD_LEN 4
+#define BT_PSWD_LEN 5
 
 
 #ifdef BT_DEBUG
@@ -131,6 +131,7 @@ private:
 	BTRole _parseRole(char* cmdResult);
 	void _parsePswd(const char* cmdResult);
 	int _parseInt(const char* cmdResult, const char* token);
+	char* _storeAddress(const char* cmeResult);
 };
 
 #endif /* BTSERIAL_H_ */

@@ -106,7 +106,9 @@ char* BTSerial::version() {
 }
 
 char* BTSerial::address() {
-	return command(BT_AT_ADDR, BT_AT_ADDR_TIME);
+	command(BT_AT_ADDR, BT_AT_ADDR_TIME);
+	return _storeAddress(_buffer);
+
 }
 
 int BTSerial::checkModule() {
@@ -292,6 +294,17 @@ char* BTSerial::strnxt(const char* str, const char* token) {
 		idx += strlen(token);
 	}
 	return idx;
+}
+
+char* BTSerial::_storeAddress(const char* cmdResult){
+	char*idx = strnxt(cmdResult, "ADDR:");
+	char* ad = _address;
+	while (*idx != '\r'){
+		*ad++=*idx++;
+	}
+	*idx='\0';
+	return _address;
+
 }
 
 BTRole BTSerial::_parseRole(char* cmdResult) {
