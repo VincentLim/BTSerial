@@ -52,4 +52,10 @@
 #define BT_AT_ADCN "AT+ADCN?"
 #define BT_AT_ACDN_TIME 150
 
+#define BT_AT_SET_CMODE "AT+CMODE="
+#define BT_AT_SET_CMODE_TIME 150
+
+#define BT_AT_GET_CMODE "AT+CMODE?"
+#define BT_AT_GET_CMODE_TIME 150
+
 #endif /* BTSERIAL_CMDS_H_ */

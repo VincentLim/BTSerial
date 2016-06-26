@@ -70,8 +70,7 @@ void BTSerial::powerOn(bool cmd, int baud) {
 		digitalWrite(_pwrPin, HIGH);
 		_serial->begin(b);
 		_powered = true;
-		BT_DEBUG_PRINT(">> Bluetooth module power on. Baud rate : ");
-		BT_DEBUG_PRINTLN(b);
+		BT_DEBUG_PRINT(">> Bluetooth module power on. Baud rate : "); BT_DEBUG_PRINTLN(b);
 	}
 }
 
@@ -168,7 +167,6 @@ BTResult BTSerial::init() {
 
 BTResult BTSerial::setPasswd(const char* passwd) {
 	char cmd[16] = BT_AT_SET_PSWD;
-	size_t cmd_len = strlen(BT_AT_SET_PSWD);
 	strncat(cmd, passwd, BT_PSWD_LEN);
 
 	command(cmd, BT_AT_SET_PSWD_TIME);
@@ -193,6 +191,34 @@ int BTSerial::countPairList() {
 	}
 
 	return -1;
+}
+
+BTResult BTSerial::setCMode(BTCMode cMode) {
+	char cmd[16] = BT_AT_SET_CMODE;
+	size_t cmd_len = strlen(BT_AT_SET_CMODE);
+	_last = NONE;
+	if (cMode != CMODE_ERROR) {
+		cmd[cmd_len] = cMode;
+		//cmd[cmd_len+1]='\0';
+		command(cmd, BT_AT_SET_CMODE_TIME);
+	}
+	return _last;
+}
+
+BTCMode BTSerial::getCMode() {
+	command(BT_AT_GET_CMODE, BT_AT_GET_CMODE_TIME);
+	if (_last == SUCCESS) {
+		char*idx = strnxt(_buffer, "CMOD:");
+		switch (*idx) {
+		case '0':
+			return FIXED;
+		case '1':
+			return ANY;
+		case '2':
+			return CMODE_SLAVE_LOOP;
+		}
+	}
+	return CMODE_ERROR;
 }
 
 // Utilities
@@ -266,10 +292,7 @@ int BTSerial::readReturn(char* buffer, int size_buffer, int timeout) {
 	// reading over. Add termination to string and return result
 	*bufPos = '\0';
 	// log
-	BT_DEBUG_PRINT(">> Command return : ");
-	BT_DEBUG_PRINTLN(read);
-	BT_DEBUG_PRINT("<<");
-	BT_DEBUG_PRINTLN(buffer);
+	BT_DEBUG_PRINT(">> Command return : "); BT_DEBUG_PRINTLN(read); BT_DEBUG_PRINT("<<"); BT_DEBUG_PRINTLN(buffer);
 
 	return success;
 }
@@ -296,13 +319,13 @@ char* BTSerial::strnxt(const char* str, const char* token) {
 	return idx;
 }
 
-char* BTSerial::_storeAddress(const char* cmdResult){
+char* BTSerial::_storeAddress(const char* cmdResult) {
 	char*idx = strnxt(cmdResult, "ADDR:");
 	char* ad = _address;
-	while (*idx != '\r'){
-		*ad++=*idx++;
+	while (*idx != '\r') {
+		*ad++ = *idx++;
 	}
-	*idx='\0';
+	*idx = '\0';
 	return _address;
 
 }
@@ -319,8 +342,7 @@ BTRole BTSerial::_parseRole(char* cmdResult) {
 		case '2':
 			return SLAVE_LOOP;
 		}
-	}
-	BT_DEBUG_PRINTLN("ERROR");
+	} BT_DEBUG_PRINTLN("ERROR");
 	return ROLE_ERROR;
 }
 
@@ -344,8 +366,7 @@ void BTSerial::dump(long timeout) {
 
 char* BTSerial::command(const char cmd[], int timeout /*default=BT_READ_TO*/) {
 	_cmd(true);
-	BT_DEBUG_PRINT(">> Bluetooth sending command : ");
-	BT_DEBUG_PRINTLN(cmd);
+	BT_DEBUG_PRINT(">> Bluetooth sending command : "); BT_DEBUG_PRINTLN(cmd);
 	print(cmd);
 	print("\r\n");
 
