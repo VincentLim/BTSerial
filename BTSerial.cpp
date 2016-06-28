@@ -13,11 +13,11 @@
 #include "BTSerial.h"
 #include "BTSerial_cmds.h"
 
-char* strreplace(char* str, char pattern, char replace){
-	char* pos=str;
-	while(*pos){
-		if(*pos==pattern){
-			*pos=replace;
+char* strreplace(char* str, char pattern, char replace) {
+	char* pos = str;
+	while (*pos) {
+		if (*pos == pattern) {
+			*pos = replace;
 		}
 		++pos;
 	}
@@ -81,7 +81,8 @@ void BTSerial::powerOn(bool cmd, int baud) {
 		digitalWrite(_pwrPin, HIGH);
 		_serial->begin(b);
 		_powered = true;
-		BT_DEBUG_PRINT(">> Bluetooth module power on. Baud rate : "); BT_DEBUG_PRINTLN(b);
+		BT_DEBUG_PRINT(">> Bluetooth module power on. Baud rate : ");BT_DEBUG_PRINTLN(
+				b);
 	}
 }
 
@@ -117,7 +118,7 @@ char* BTSerial::version() {
 
 char* BTSerial::address() {
 	command(BT_AT_ADDR, BT_AT_ADDR_TIME);
-	if(_last==SUCCESS){
+	if (_last == SUCCESS) {
 		return _storeAddress(_buffer);
 	}
 	return NULL;
@@ -237,23 +238,33 @@ BTCMode BTSerial::getCMode() {
 
 int BTSerial::link(char* addr) {
 	strreplace(addr, ':', ',');
-	char cmd[32]=BT_AT_LINK;
-	size_t len=strlen(BT_AT_LINK);
-	strncpy(cmd+len, addr, 14);
+	char cmd[32] = BT_AT_LINK;
+	size_t len = strlen(BT_AT_LINK);
+	strncpy(cmd + len, addr, 14);
 	command(cmd, BT_AT_LINK_TIME);
 
-	return _last==SUCCESS;
+	return _last == SUCCESS;
 }
-
 
 int BTSerial::seekDevice(char* addr) {
 	strreplace(addr, ':', ',');
-	char cmd[32]=BT_AT_FSAD;
-	size_t len=strlen(BT_AT_FSAD);
-	strncpy(cmd+len, addr, 14);
+	char cmd[32] = BT_AT_FSAD;
+	size_t len = strlen(BT_AT_FSAD);
+	strncpy(cmd + len, addr, 14);
 	command(cmd, BT_AT_FSAD_TIME);
 
-	return _last==SUCCESS;
+	return _last == SUCCESS;
+}
+
+BTResult BTSerial::setInqAC(char* accessCode) {
+	char cmd[32]="";
+	buildCmd(cmd,BT_AT_SET_IAC,accessCode);
+	command(cmd, BT_SHORT);
+	return _last;
+}
+
+int BTSerial::inquireDevices() {
+	return 0;
 }
 
 // Utilities
@@ -327,7 +338,10 @@ int BTSerial::readReturn(char* buffer, int size_buffer, int timeout) {
 	// reading over. Add termination to string and return result
 	*bufPos = '\0';
 	// log
-	BT_DEBUG_PRINT(">> Command return : "); BT_DEBUG_PRINTLN(read); BT_DEBUG_PRINT("<<"); BT_DEBUG_PRINTLN(buffer);
+	BT_DEBUG_PRINT(">> Command return : ");
+	BT_DEBUG_PRINTLN(read);
+	BT_DEBUG_PRINT("<<");
+	BT_DEBUG_PRINTLN(buffer);
 
 	return success;
 }
@@ -377,7 +391,8 @@ BTRole BTSerial::_parseRole(char* cmdResult) {
 		case '2':
 			return SLAVE_LOOP;
 		}
-	} BT_DEBUG_PRINTLN("ERROR");
+	}
+	BT_DEBUG_PRINTLN("ERROR");
 	return ROLE_ERROR;
 }
 
@@ -392,11 +407,11 @@ void BTSerial::_parsePswd(const char* cmdResult) {
 
 void BTSerial::dump(long timeout) {
 	unsigned long end = millis() + timeout;
-	int read=0;
+	int read = 0;
 	BT_DEBUG_PRINT("<< DUMP ");
 	while (millis() < end) {
 		if (_serial->available()) {
-			BT_DEBUG_PRINT((char)_serial->read());
+			BT_DEBUG_PRINT((char )_serial->read());
 			read++;
 		}
 	}
@@ -407,7 +422,8 @@ void BTSerial::dump(long timeout) {
 
 char* BTSerial::command(const char cmd[], int timeout /*default=BT_READ_TO*/) {
 	_cmd(true);
-	BT_DEBUG_PRINT(">> Bluetooth sending command : "); BT_DEBUG_PRINTLN(cmd);
+	BT_DEBUG_PRINT(">> Bluetooth sending command : ");
+	BT_DEBUG_PRINTLN(cmd);
 	print(cmd);
 	print("\r\n");
 
@@ -419,4 +435,45 @@ char* BTSerial::command(const char cmd[], int timeout /*default=BT_READ_TO*/) {
 	return _buffer;
 }
 
+char* BTSerial::buildCmd(char* cmdBuff, const char* cmd,
+		const char* arg) {
+	size_t cmdLen = strlen(cmd);
+	strncpy(cmdBuff, cmd, cmdLen);
+	char* pos = cmdBuff + cmdLen;
+	strncpy(pos, arg, strlen(arg));
+	return cmdBuff;
+}
 
+char* BTSerial::buildCmd(char* cmdBuff, const char* cmd, char sep,
+		const char* arg1, const char* arg2) {
+	size_t cmdLen = strlen(cmd);
+	size_t arg1Len = strlen(arg1);
+	size_t arg2Len = strlen(arg2);
+	strncpy(cmdBuff, cmd, cmdLen);
+	char* pos = cmdBuff + cmdLen;
+	strncpy(pos, arg1, arg1Len);
+	pos += arg1Len;
+	*pos++ = sep;
+	strncpy(pos, arg2, arg2Len);
+
+	return cmdBuff;
+}
+
+char* BTSerial::buildCmd(char* cmdBuff, const char* cmd, char sep,
+		const char* arg1, const char* arg2, const char* arg3) {
+	size_t cmdLen = strlen(cmd);
+	size_t arg1Len = strlen(arg1);
+	size_t arg2Len = strlen(arg2);
+	size_t arg3Len = strlen(arg3);
+	strncpy(cmdBuff, cmd, cmdLen);
+	char* pos = cmdBuff + cmdLen;
+	strncpy(pos, arg1, arg1Len);
+	pos += arg1Len;
+	*pos++ = sep;
+	strncpy(pos, arg2, arg2Len);
+	pos += arg2Len;
+	*pos++ = sep;
+	strncpy(pos, arg3, arg3Len);
+
+	return cmdBuff;
+}

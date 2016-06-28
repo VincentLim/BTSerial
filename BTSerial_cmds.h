@@ -11,6 +11,11 @@
 #ifndef BTSERIAL_CMDS_H_
 #define BTSERIAL_CMDS_H_
 
+//Timeouts
+#define BT_SHORT 100
+#define BT_MEDIUM 250
+#define BT_LONG 500
+
 // Commands
 #define BT_AT "AT"
 #define BT_AT_TIME  50
@@ -63,6 +68,9 @@
 
 #define BT_AT_FSAD "AT+FSAD="
 #define BT_AT_FSAD_TIME 250
+
+#define BT_AT_SET_IAC "AT+IAC="
+#define BT_AT_GET_IAC "AT+IAC?"
 
 
 #endif /* BTSERIAL_CMDS_H_ */

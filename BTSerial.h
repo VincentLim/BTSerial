@@ -21,7 +21,7 @@
 #endif
 
 #define CMD_BAUDS 38400
-#define BT_BUF_SIZE 64
+#define BT_BUF_SIZE 256
 #define BT_READ_TO 50
 #define BT_NL_CHAR '\n'
 #define BT_PSWD_LEN 5
@@ -120,6 +120,8 @@ public:
 	BTCMode getCMode();
 	int link(char* addr);
 	int seekDevice(char* addr);
+	int inquireDevices();
+	BTResult setInqAC(char* accessCode);
 
 	// Utils
 	BTResult getLastResult(char* result, int size);
@@ -146,6 +148,9 @@ private:
 	void _parsePswd(const char* cmdResult);
 	int _parseInt(const char* cmdResult, const char* token);
 	char* _storeAddress(const char* cmeResult);
+	char* buildCmd(char* cmdBuff, const char* cmd, const char* arg);
+	char* buildCmd(char* cmdBuff, const char* cmd, char sep, const char* arg1, const char* arg2);
+	char* buildCmd(char* cmdBuff, const char* cmd, char sep, const char* arg1, const char* arg2, const char* arg3);
 };
 
 #endif /* BTSERIAL_H_ */
