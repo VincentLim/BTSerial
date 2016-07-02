@@ -147,7 +147,7 @@ private:
 	BTRole _parseRole(char* cmdResult);
 	void _parsePswd(const char* cmdResult);
 	int _parseInt(const char* cmdResult, const char* token);
-	char* _storeAddress(const char* cmeResult);
+	char* _storeAddress(const char* cmdResult);
 	char* buildCmd(char* cmdBuff, const char* cmd, const char* arg);
 	char* buildCmd(char* cmdBuff, const char* cmd, char sep, const char* arg1, const char* arg2);
 	char* buildCmd(char* cmdBuff, const char* cmd, char sep, const char* arg1, const char* arg2, const char* arg3);
