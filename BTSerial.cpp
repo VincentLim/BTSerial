@@ -256,20 +256,30 @@ int BTSerial::seekDevice(char* addr) {
 	return _last == SUCCESS;
 }
 
-BTResult BTSerial::setInqAC(char* accessCode) {
+BTResult BTSerial::setInqAC(const char* accessCode) {
 	char cmd[32]="";
 	buildCmd(cmd,BT_AT_SET_IAC,accessCode);
-	command(cmd, BT_SHORT);
+	command(cmd, BT_MEDIUM);
 	return _last;
 }
 
-int BTSerial::inquireDevices() {
-	return 0;
+int BTSerial::inquireDevices(unsigned int time) {
+	command(BT_AT_INQ, time);
+
+	return _last == SUCCESS;
 }
+
+BTResult BTSerial::setClass(char* btClass) {
+	char cmd[32]="";
+		buildCmd(cmd,BT_AT_SET_CLASS,btClass);
+		command(cmd, BT_SHORT);
+		return _last;
+}
+
 
 // Utilities
 
-int BTSerial::readUntil(char* buffer, char term, int size_buff, int timeout) {
+int BTSerial::readUntil(char* buffer, char term, int size_buff, unsigned int timeout) {
 	unsigned long end = millis() + timeout;
 	int readCount = 0;
 	char lastRead = 0;
@@ -292,7 +302,7 @@ int BTSerial::readUntil(char* buffer, char term, int size_buff, int timeout) {
 	return readCount;
 }
 
-int BTSerial::readReturn(char* buffer, int size_buffer, int timeout) {
+int BTSerial::readReturn(char* buffer, int size_buffer, unsigned int timeout) {
 
 	int read = 0;
 	bool success = false;
@@ -369,7 +379,7 @@ char* BTSerial::strnxt(const char* str, const char* token) {
 }
 
 char* BTSerial::_storeAddress(const char* cmdResult) {
-	char*idx = strnxt(cmdResult, "ADDR:");
+	char*idx = strnxt(cmdResult, "ADDR:"); // TODO #define
 	char* ad = _address;
 	while (*idx != '\r') {
 		*ad++ = *idx++;
@@ -420,10 +430,12 @@ void BTSerial::dump(long timeout) {
 	BT_DEBUG_PRINTLN(" chars dumped.");
 }
 
-char* BTSerial::command(const char cmd[], int timeout /*default=BT_READ_TO*/) {
+char* BTSerial::command(const char cmd[], unsigned int timeout /*default=BT_READ_TO*/) {
 	_cmd(true);
 	BT_DEBUG_PRINT(">> Bluetooth sending command : ");
 	BT_DEBUG_PRINTLN(cmd);
+	BT_DEBUG_PRINT(">> Timeout : ");
+	BT_DEBUG_PRINTLN(timeout);
 	print(cmd);
 	print("\r\n");
 
@@ -477,3 +489,4 @@ char* BTSerial::buildCmd(char* cmdBuff, const char* cmd, char sep,
 
 	return cmdBuff;
 }
+

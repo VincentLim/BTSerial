@@ -12,9 +12,10 @@
 #define BTSERIAL_CMDS_H_
 
 //Timeouts
-#define BT_SHORT 100
-#define BT_MEDIUM 250
-#define BT_LONG 500
+#define BT_SHORT 250
+#define BT_MEDIUM 500
+#define BT_LONG 1000
+#define BT_LONG_10 10000
 
 // Commands
 #define BT_AT "AT"
@@ -72,5 +73,8 @@
 #define BT_AT_SET_IAC "AT+IAC="
 #define BT_AT_GET_IAC "AT+IAC?"
 
+#define BT_AT_INQ "AT+INQ"
+#define BT_AT_INQM "AT+INQM"
+#define BT_AT_SET_CLASS "AT+CLASS="
 
 #endif /* BTSERIAL_CMDS_H_ */

@@ -69,6 +69,7 @@ enum BTResult {
 	NONE
 };
 
+
 struct Device {
 	char address[14];
 	char name[64];
@@ -88,19 +89,46 @@ public:
 	 * false start on communication mode at 'baud' bauds
 	 */
 	void powerOn(bool cmd, int baud = 9600);
+	/**
+	 * Turn off BT module by setting pwrPin to LOW
+	 */
 	void powerOff();
 
+	/**
+	 * Init serial
+	 */
 	void begin(int baud);
+	/**
+	 * end serial
+	 */
 	void end();
+	/**
+	 * Serial available. true if a char is pending in serial input
+	 */
 	int available() const;
+	/**
+	 * peek serial input
+	 */
 	int peek() const;
+	/**
+	 * read serial input
+	 */
 	int read();
+	/**
+	 * write to serial
+	 */
 	size_t write(uint8_t);
+	/**
+	 * print to serial
+	 */
 	size_t print(const char[]);
 
+	/**
+	 * switch command mode (cmdPin)
+	 */
 	void _cmd(bool);
 
-	char* command(const char[], int timeout = BT_READ_TO);
+	char* command(const char[], unsigned int timeout = BT_READ_TO);
 
 	// AT commands
 	char* version();
@@ -120,8 +148,10 @@ public:
 	BTCMode getCMode();
 	int link(char* addr);
 	int seekDevice(char* addr);
-	int inquireDevices();
-	BTResult setInqAC(char* accessCode);
+	int inquireDevices(unsigned int time);
+	BTResult setInqAC(const char* accessCode);
+	BTResult setClass(const char* btClass);
+	BTResult setInquireMode(char mode, char max, int time);
 
 	// Utils
 	BTResult getLastResult(char* result, int size);
@@ -140,8 +170,8 @@ private:
 	char _address[16];
 
 
-	int readUntil(char* buffer, char term, int size_buff, int timeout);
-	int readReturn(char* buffer, int size_buff, int timeout);
+	int readUntil(char* buffer, char term, int size_buff, unsigned int timeout);
+	int readReturn(char* buffer, int size_buff, unsigned int timeout);
 	void dump(long timeout);
 	char* strnxt(const char* str, const char* token);
 	BTRole _parseRole(char* cmdResult);
